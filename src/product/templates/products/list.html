@@ -55,7 +55,7 @@
                     </thead>
 
                     <tbody>
-                    <tr>
+                    <!-- <tr>
                         <td>1</td>
                         <td>T-Shirt <br> Created at : 25-Aug-2020</td>
                         <td>Quality product in low cost</td>
@@ -106,7 +106,33 @@
                                 <a href="" class="btn btn-success">Edit</a>
                             </div>
                         </td>
-                    </tr>
+                    </tr> -->
+                    {% for product in products %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ product.title }} <br> Created at: {{ product.created_at|date:"d-M-Y" }}</td>
+                            <td>{{ product.description }}</td>
+                            <td>
+                                <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
+                                    {% for variant in product.variants.all %}
+                                        <dt class="col-sm-3 pb-0">{{ variant.title }}</dt>
+                                        <dd class="col-sm-9">
+                                            <dl class="row mb-0">
+                                                <dd class="col-sm-4 pb-0">Price: {{ variant.price }}</dd>
+                                                <dd class="col-sm-8 pb-0">InStock: {{ variant.stock }}</dd>
+                                            </dl>
+                                        </dd>
+                                    {% endfor %}
+                                </dl>
+                                <!-- <button onclick="$('#variant').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more</button> -->
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'product:edit.product' product.id %}" class="btn btn-success">Edit</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
 
                 </table>
