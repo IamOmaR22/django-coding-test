@@ -5,6 +5,7 @@ from django.utils.decorators import method_decorator
 from product.models import Variant, Product
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 class CreateProductView(generic.TemplateView):
@@ -55,10 +56,24 @@ class CreateProductView(generic.TemplateView):
 
 class ProductListView(View):
     template_name = 'products/list.html'
+    paginate_by = 5
 
     def get(self, request, *args, **kwargs):
         # Fetch products from the database
         products = Product.objects.all()
+
+        # Pagination logic
+        paginator = Paginator(products, self.paginate_by)
+        page = request.GET.get('page')
+
+        try:
+            products = paginator.page(page)
+        except PageNotAnInteger:
+            # If the page is not an integer, deliver the first page.
+            products = paginator.page(1)
+        except EmptyPage:
+            # If the page is out of range, deliver the last page of results.
+            products = paginator.page(paginator.num_pages)
 
         # Pass products to the template
         context = {'products': products}

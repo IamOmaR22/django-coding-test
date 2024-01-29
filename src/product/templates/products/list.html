@@ -143,10 +143,36 @@
         <div class="card-footer">
             <div class="row justify-content-between">
                 <div class="col-md-6">
-                    <p>Showing 1 to 10 out of 100</p>
+                    <p>Showing {{ products|length }} products</p>
                 </div>
-                <div class="col-md-2">
-
+                <div class="col-md-3">
+                     <!-- Pagination -->
+                     <div class="pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if products.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">&laquo; first</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ products.previous_page_number }}">previous</a>
+                                </li>
+                            {% endif %}
+                    
+                            <li class="page-item disabled">
+                                <span class="page-link">Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
+                            </li>
+                    
+                            {% if products.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ products.next_page_number }}">next</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ products.paginator.num_pages }}">last &raquo;</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    
                 </div>
             </div>
         </div>
