@@ -5,6 +5,12 @@ import Dropzone from 'react-dropzone'
 
 
 const CreateProduct = (props) => {
+    const [formData, setFormData] = useState({
+        product_name: '',
+        product_sku: '',
+        description: '',
+        // Include other fields as needed
+    });
 
     const [productVariantPrices, setProductVariantPrices] = useState([])
 
@@ -17,50 +23,50 @@ const CreateProduct = (props) => {
     console.log(typeof props.variants)
     // handle click event of the Add button
     const handleAddClick = () => {
-        let all_variants = JSON.parse(props.variants.replaceAll("'", '"')).map(el => el.id)
+        let all_variants = JSON.parse(props.variants.replaceAll("'", '"')).map(el => el.id);
         let selected_variants = productVariants.map(el => el.option);
-        let available_variants = all_variants.filter(entry1 => !selected_variants.some(entry2 => entry1 == entry2))
+        let available_variants = all_variants.filter(entry1 => !selected_variants.some(entry2 => entry1 == entry2));
         setProductVariant([...productVariants, {
             option: available_variants[0],
             tags: []
-        }])
+        }]);
     };
 
     // handle input change on tag input
     const handleInputTagOnChange = (value, index) => {
-        let product_variants = [...productVariants]
-        product_variants[index].tags = value
-        setProductVariant(product_variants)
+        let product_variants = [...productVariants];
+        product_variants[index].tags = value;
+        setProductVariant(product_variants);
 
-        checkVariant()
-    }
+        checkVariant();
+    };
 
     // remove product variant
     const removeProductVariant = (index) => {
-        let product_variants = [...productVariants]
-        product_variants.splice(index, 1)
-        setProductVariant(product_variants)
-    }
+        let product_variants = [...productVariants];
+        product_variants.splice(index, 1);
+        setProductVariant(product_variants);
+    };
 
     // check the variant and render all the combination
     const checkVariant = () => {
         let tags = [];
 
         productVariants.filter((item) => {
-            tags.push(item.tags)
-        })
+            tags.push(item.tags);
+        });
 
-        setProductVariantPrices([])
+        setProductVariantPrices([]);
 
         getCombn(tags).forEach(item => {
             setProductVariantPrices(productVariantPrice => [...productVariantPrice, {
                 title: item,
                 price: 0,
                 stock: 0
-            }])
-        })
+            }]);
+        });
+    };
 
-    }
 
     // combination algorithm
     function getCombn(arr, pre) {
@@ -73,33 +79,109 @@ const CreateProduct = (props) => {
         }, []);
         return ans;
     }
-
     // Save product
-    let saveProduct = (event) => {
+    // let saveProduct = (event) => {
+    //     event.preventDefault();
+    //     // TODO : write your code here to save the product
+    // }
+    const saveProduct = async (event) => {
         event.preventDefault();
-        // TODO : write your code here to save the product
+    
+        try {
+            // Check if product_name is not empty
+            if (!formData.product_name.trim()) {
+                console.error('Product Name is required');
+                return;
+            }
+    
+            const response = await fetch('/product/create/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+    
+            if (!response.ok) {
+                console.error(`Error: ${response.status} - ${response.statusText}`);
+                return;
+            }
+    
+            const data = await response.json();
+            console.log(data);
+    
+            // TODO: You can perform additional actions based on the response if needed
+        } catch (error) {
+            console.error('Error:', error.message);
+        }
+    };
+    
+    
+    
+    
+
+    
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
 
 
     return (
         <div>
             <section>
+            <form onSubmit={saveProduct}>
                 <div className="row">
                     <div className="col-md-6">
                         <div className="card shadow mb-4">
                             <div className="card-body">
-                                <div className="form-group">
-                                    <label htmlFor="">Product Name</label>
-                                    <input type="text" placeholder="Product Name" className="form-control"/>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="">Product SKU</label>
-                                    <input type="text" placeholder="Product Name" className="form-control"/>
-                                </div>
-                                <div className="form-group">
-                                    <label htmlFor="">Description</label>
-                                    <textarea id="" cols="30" rows="4" className="form-control"></textarea>
-                                </div>
+                            <div className="form-group">
+                                <label htmlFor="product_name">Product Name</label>
+                                <input
+                                    type="text"
+                                    id="product_name"
+                                    placeholder="Product Name"
+                                    className="form-control"
+                                    value={formData.product_name}
+                                    onChange={(e) => setFormData({ ...formData, product_name: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="product_sku">Product SKU</label>
+                                <input
+                                    type="text"
+                                    id="product_sku"
+                                    placeholder="Product SKU"
+                                    className="form-control"
+                                    value={formData.product_sku}
+                                    onChange={(e) => setFormData({ ...formData, product_sku: e.target.value })}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="description">Description</label>
+                                <textarea
+                                    id="description"
+                                    cols="30"
+                                    rows="4"
+                                    className="form-control"
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                ></textarea>
+                            </div>
+
                             </div>
                         </div>
 
@@ -213,10 +295,11 @@ const CreateProduct = (props) => {
                             </div>
                         </div>
                     </div>
+                    <button type="submit" className="btn btn-lg btn-primary">Save</button>
+                        <button type="button" className="btn btn-secondary btn-lg">Cancel</button>
                 </div>
+                </form>
 
-                <button type="button" onClick={saveProduct} className="btn btn-lg btn-primary">Save</button>
-                <button type="button" className="btn btn-secondary btn-lg">Cancel</button>
             </section>
         </div>
     );

@@ -8,14 +8,128 @@
         <a href="{% url 'product:create.product' %}" class="float-right btn btn-primary">All Product</a>
     </div>
 
+    <form action="{% url 'product:create.product' %}" method="POST">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="product_name">Product Name</label>
+                            <input type="text" id="product_name" name="product_name" placeholder="Product Name" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product_sku">Product SKU</label>
+                            <input type="text" id="product_sku" name="product_sku" placeholder="Product SKU" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea id="description" name="description" cols="30" rows="4" placeholder="Product Description" class="form-control" required></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add other form fields as needed -->
+
+            <div class="col-md-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Variants</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="variant_option">Select Variant</label>
+                                    <select class="form-control" id="variant_option">
+                                        {% for variant in variants %}
+                                            <option value="{{ variant.id }}">{{ variant.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="variant_value">Variant Value</label>
+                                    <input type="text" class="form-control" id="variant_value" placeholder="Enter value">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        
+                        <button type="button" class="btn btn-primary" onclick="addRowToTable()">Add another option</button>
+            
+                        <!-- Table to display added variants and values -->
+                        <table class="table mt-3">
+                            <thead>
+                                <tr>
+                                    <th>Variant</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="variantTableBody">
+                                <!-- Rows will be dynamically added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Media</h6>
+                    </div>
+                    <div class="card-body border">
+                        <!-- Example Image Upload -->
+                        <input type="file" name="product_image" id="product_image">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-lg btn-primary">Save</button>
+            <a href="#" class="btn btn-secondary btn-lg">Cancel</a>
+        </div>
+    </form>
 
     <script>
-    var varients = {{ variants|safe }}
-    console.log(typeof varients)
+        function addRowToTable() {
+            var variantOption = document.getElementById('variant_option');
+            var variantValue = document.getElementById('variant_value').value;
+    
+            if (!variantOption.value || !variantValue.trim()) {
+                alert('Please select a variant and enter a value.');
+                return;
+            }
+    
+            // Create a new row
+            var newRow = document.createElement('tr');
+    
+            // Create cells for variant and value
+            var variantCell = document.createElement('td');
+            variantCell.textContent = variantOption.options[variantOption.selectedIndex].text;
+    
+            var valueCell = document.createElement('td');
+            valueCell.textContent = variantValue;
+    
+            // Append cells to the row
+            newRow.appendChild(variantCell);
+            newRow.appendChild(valueCell);
+    
+            // Append the row to the table body
+            document.getElementById('variantTableBody').appendChild(newRow);
+    
+            // Clear input fields
+            variantOption.selectedIndex = 0;
+            document.getElementById('variant_value').value = '';
+        }
     </script>
-
-    <div id="root">
-        <CreateProduct id="variants" data-variants="{{ variants|safe }}"></CreateProduct>
-    </div>
 
 {% endblock %}
