@@ -6,7 +6,7 @@ from product.models import Variant, Product, ProductVariant, ProductVariantPrice
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.db.models import Q
 
 class CreateProductView(generic.TemplateView):
     template_name = 'products/create.html'
@@ -69,6 +69,28 @@ class ProductListView(View):
         try:
             products = Product.objects.all()
 
+            variants = Variant.objects.filter(active=True).values('id', 'title')
+
+            title = request.GET.get('title')
+            variant_id = request.GET.get('variant')
+            price_from = request.GET.get('price_from')
+            price_to = request.GET.get('price_to')
+            date = request.GET.get('date')
+
+            if title:
+                products = products.filter(title__icontains=title)
+
+            if variant_id:
+                products = products.filter(productvariant_set__variant_id=variant_id)
+
+            if price_from and price_to:
+                products = products.filter(
+                    productvariant_set__productvariantprice_set__price__range=(price_from, price_to)
+                )
+
+            if date:
+                products = products.filter(created_at__date=date)
+
             paginator = Paginator(products, self.paginate_by)
             page = request.GET.get('page')
 
@@ -79,7 +101,7 @@ class ProductListView(View):
             except EmptyPage:
                 products = paginator.page(paginator.num_pages)
 
-            context = {'products': products}
+            context = {'products': products, 'variants': variants}
             return render(request, self.template_name, context)
 
         except Exception as e:
