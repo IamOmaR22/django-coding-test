@@ -112,11 +112,13 @@
                                             id="variant_{{ variant.id }}"
                                             name="variant_{{ variant.id }}"
                                             placeholder="Enter value"
+                                            value="{% for existing_variant in existing_variants %}{% if existing_variant.variant.id == variant.id %}{{ existing_variant.variant_title }}{% endif %}{% endfor %}"
                                         >
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
+
 
                         <!-- <button
                             type="button"

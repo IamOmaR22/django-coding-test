@@ -34,30 +34,34 @@ class CreateProductView(generic.TemplateView):
                 description=description
             )
 
-            for variant_id in self.request.POST.getlist('variants'):
-                variant = Variant.objects.get(id=variant_id)
-                
-                product_variant = ProductVariant.objects.create(
-                    product=new_product,
-                    variant_title=variant.title,
-                    variant=variant,
-                )
+            for variant in self.request.POST:
+                if variant.startswith('variant_'):
+                    variant_id = variant.split('_')[1]
+                    variant_value = self.request.POST.get(variant)
 
-                price = self.request.POST.get(f'price_{variant_id}')
-                stock = self.request.POST.get(f'stock_{variant_id}')
+                    product_variant = ProductVariant.objects.create(
+                        product=new_product,
+                        variant_title=variant_value,
+                        variant_id=variant_id
+                    )
 
-                ProductVariantPrice.objects.create(
-                    product_variant_one=product_variant,
-                    price=float(price),
-                    stock=float(stock),
-                    product=new_product
-                )
+                    # Check if price and stock values are provided
+                    price = self.request.POST.get(f'price_{variant_id}')
+                    stock = self.request.POST.get(f'stock_{variant_id}')
 
-            # return JsonResponse({'message': 'Product created successfully!'})
+                    if price is not None and stock is not None:
+                        ProductVariantPrice.objects.create(
+                            product_variant_one=product_variant,
+                            price=float(price),
+                            stock=float(stock),
+                            product=new_product
+                        )
+
             return redirect('product:list.product')
 
         except Exception as e:
             return JsonResponse({'message': f'Error creating product: {str(e)}'}, status=500)
+
 
 
 
@@ -102,6 +106,10 @@ class ProductListView(View):
                 products = paginator.page(paginator.num_pages)
 
             context = {'products': products, 'variants': variants}
+            
+            # Include product variant prices in the context
+            context['product_variant_prices'] = ProductVariantPrice.objects.all()
+
             return render(request, self.template_name, context)
 
         except Exception as e:
@@ -118,9 +126,12 @@ class EditProductView(View):
     def get(self, request, *args, **kwargs):
         product_id = kwargs.get('id')
         product = get_object_or_404(Product, id=product_id)
+        # variants = Variant.objects.filter(active=True).values('id', 'title')
+        existing_variants = product.productvariant_set.all()
+
         variants = Variant.objects.filter(active=True).values('id', 'title')
 
-        return render(request, self.template_name, {'product': product, 'variants': variants})
+        return render(request, self.template_name, {'product': product, 'variants': variants, 'existing_variants': existing_variants})
 
     def post(self, request, *args, **kwargs):
         try:
