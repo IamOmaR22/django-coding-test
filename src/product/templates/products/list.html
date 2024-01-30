@@ -114,17 +114,17 @@
                             <td>{{ product.description }}</td>
                             <td>
                                 <dl class="row mb-0" style="height: 80px; overflow: hidden" id="variant">
-                                    {% for variant in product.variants.all %}
-                                        <dt class="col-sm-3 pb-0">{{ variant.title }}</dt>
+                                    {% for variant in product.productvariant_set.all %}
+                                        <dt class="col-sm-3 pb-0">{{ variant.variant_title }}</dt>
                                         <dd class="col-sm-9">
                                             <dl class="row mb-0">
-                                                <dd class="col-sm-4 pb-0">Price: {{ variant.price }}</dd>
-                                                <dd class="col-sm-8 pb-0">InStock: {{ variant.stock }}</dd>
+                                                <dd class="col-sm-4 pb-0">Price: {{ variant.productvariantprice_set.first.price }}</dd>
+                                                <dd class="col-sm-8 pb-0">InStock: {{ variant.productvariantprice_set.first.stock }}</dd>
                                             </dl>
                                         </dd>
                                     {% endfor %}
                                 </dl>
-                                <!-- <button onclick="$('#variant').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more</button> -->
+                                <button onclick="$('#variant').toggleClass('h-auto')" class="btn btn-sm btn-link">Show more</button>
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm">

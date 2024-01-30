@@ -100,50 +100,44 @@
                             </table>
                         {% endif %}
 
+                        <!-- Modify the variant input fields -->
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="variant_option">Select Variant</label>
-                                    <select class="form-control" id="variant_option">
-                                        {% for variant in variants %}
-                                            <option value="{{ variant.id }}">{{ variant.title }}</option>
-                                        {% endfor %}
-                                    </select>
+                            {% for variant in variants %}
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="variant_{{ variant.id }}">{{ variant.title }}</label>
+                                        <input
+                                            type="text"
+                                            class="form-control"
+                                            id="variant_{{ variant.id }}"
+                                            name="variant_{{ variant.id }}"
+                                            placeholder="Enter value"
+                                        >
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="variant_value">Variant Value</label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="variant_value"
-                                        placeholder="Enter value"
-                                    >
-                                </div>
-                            </div>
+                            {% endfor %}
                         </div>
 
-                        <button
+                        <!-- <button
                             type="button"
                             class="btn btn-primary"
                             onclick="addRowToTable()"
                         >
                             Add another option
-                        </button>
+                        </button> -->
 
                         <!-- Table to display added variants and values -->
-                        <table class="table mt-3">
-                            <thead>
-                                <tr>
-                                    <th>Variant</th>
-                                    <th>Value</th>
-                                </tr>
-                            </thead>
-                            <tbody id="variantTableBody">
+                        <!-- <table class="table mt-3"> -->
+                            <!-- <thead> -->
+                                <!-- <tr> -->
+                                    <!-- <th>Variant</th> -->
+                                    <!-- <th>Value</th> -->
+                                <!-- </tr> -->
+                            <!-- </thead> -->
+                            <!-- <tbody id="variantTableBody"> -->
                                 <!-- Rows will be dynamically added here -->
-                            </tbody>
-                        </table>
+                            <!-- </tbody> -->
+                        <!-- </table> -->
                     </div>
                 </div>
             </div>
