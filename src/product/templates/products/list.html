@@ -119,8 +119,12 @@
                                         <dt class="col-sm-3 pb-0">{{ variant.variant_title }}</dt>
                                         <dd class="col-sm-9">
                                             <dl class="row mb-0">
-                                                <dd class="col-sm-4 pb-0">Price: {{ variant.productvariantprice_set.first.price }}</dd>
-                                                <dd class="col-sm-8 pb-0">InStock: {{ variant.productvariantprice_set.first.stock }}</dd>
+                                                {% for price in product_variant_prices %}
+                                                    {% if price.product_variant_one == variant %}
+                                                        <dd class="col-sm-4 pb-0">Price: {{ price.price }}</dd>
+                                                        <dd class="col-sm-8 pb-0">InStock: {{ price.stock }}</dd>
+                                                    {% endif %}
+                                                {% endfor %}
                                             </dl>
                                         </dd>
                                     {% endfor %}

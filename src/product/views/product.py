@@ -75,6 +75,11 @@ class ProductListView(View):
 
             variants = Variant.objects.filter(active=True).values('id', 'title')
 
+            # Retrieve all prices related to product variants
+            product_variant_prices = ProductVariantPrice.objects.select_related(
+                'product_variant_one', 'product_variant_two', 'product_variant_three'
+            ).all()
+
             title = request.GET.get('title')
             variant_id = request.GET.get('variant')
             price_from = request.GET.get('price_from')
@@ -105,15 +110,17 @@ class ProductListView(View):
             except EmptyPage:
                 products = paginator.page(paginator.num_pages)
 
-            context = {'products': products, 'variants': variants}
-            
-            # Include product variant prices in the context
-            context['product_variant_prices'] = ProductVariantPrice.objects.all()
+            context = {
+                'products': products,
+                'variants': variants,
+                'product_variant_prices': product_variant_prices,
+            }
 
             return render(request, self.template_name, context)
 
         except Exception as e:
             return JsonResponse({'message': f'Error fetching products: {str(e)}'}, status=500)
+
     
 
 class EditProductView(View):
